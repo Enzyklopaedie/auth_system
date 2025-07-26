@@ -127,7 +127,8 @@ app.get("/dashboard", (req, res) => {
 app.post("/register", (req, res) => {
   const email = req.body.email;
   const username = req.body.username;
-  const password = req.body.password;
+  const password_plaintext = req.body.password;
+  const password = bcrypt.hash(password_plaintext,10);
   const role = "user";
   const verification_token = crypto.randomBytes(32).toString("hex");
   conn.query(
@@ -246,7 +247,8 @@ app.get("/verify-new-mail", (req, res) => {
 
 app.post("/login", (req, res) => {
   const identifier = req.body.identifier;
-  const password = req.body.password;
+  const password_plaintext = req.body.password;
+  const password = bcrypt.compare(password_plaintext, results[0].password)
   conn.query(
     "SELECT * FROM users WHERE email = ? OR username = ?",
     [identifier, identifier],
